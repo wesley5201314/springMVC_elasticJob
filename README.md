@@ -1,2 +1,3 @@
-# springMVC_elasticJob
-springmvc整合elasticJob，elasticJob是当当开源的分布式任务调度。
+#springMVC_elasticJob
+
+springMVC整合elasticJob简单示例源码。

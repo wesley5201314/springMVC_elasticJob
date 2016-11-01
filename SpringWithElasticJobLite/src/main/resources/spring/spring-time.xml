@@ -1,0 +1,73 @@
+<beans xmlns="http://www.springframework.org/schema/beans"
+	xmlns:xsi="http://www.w3.org/2001/XMLSchema-instance" xmlns:context="http://www.springframework.org/schema/context"
+	xmlns:hsf="http://www.taobao.com/hsf" xmlns:reg="http://www.dangdang.com/schema/ddframe/reg"
+	xmlns:job="http://www.dangdang.com/schema/ddframe/job"
+	xsi:schemaLocation="http://www.springframework.org/schema/beans
+       http://www.springframework.org/schema/beans/spring-beans.xsd
+       http://www.springframework.org/schema/context
+       http://www.springframework.org/schema/context/spring-context.xsd http://www.dangdang.com/schema/ddframe/reg 
+       http://www.dangdang.com/schema/ddframe/reg/reg.xsd 
+                        http://www.dangdang.com/schema/ddframe/job 
+                        http://www.dangdang.com/schema/ddframe/job/job.xsd">
+
+	<description>内部接口配置</description>
+
+	<!-- 配置作业注册中心 -->
+	<bean id="regCenter"
+		class="com.dangdang.ddframe.job.reg.zookeeper.ZookeeperRegistryCenter"
+		init-method="init">
+		<constructor-arg>
+			<bean class="com.dangdang.ddframe.job.reg.zookeeper.ZookeeperConfiguration">
+				<property name="serverLists" value="${TASK_SERVER_LISTS}" />
+				<property name="namespace" value="${TASK_NAMESPACE}" />
+				<property name="baseSleepTimeMilliseconds" value="${TASK_BASE_SLEEP_TIME_MILLISECONDS}" />
+				<property name="maxSleepTimeMilliseconds" value="${TASK_MAX_SLEEP_TIME_MILLISECONDS}" />
+				<property name="maxRetries" value="${TASK_MAX_RETRIES}" />
+			</bean>
+		</constructor-arg>
+	</bean>
+
+
+	<!-- 简单的定时任务注册器 -->
+	<bean id="mySimpleTimeTaskJobRegister"
+		class="com.elasticjob.demo.register.SimpleTimeTaskJobRegister"
+		init-method="init">
+		<property name="regCenter" ref="regCenter"></property>
+	</bean>
+
+	<!-- 流式的定时任务注册器 -->
+	<bean id="MyDataflowTimeTaskJobRegister"
+		class="com.elasticjob.demo.register.DataflowTimeTaskJobRegister"
+		init-method="init">
+		<property name="regCenter" ref="regCenter"></property>
+	</bean>
+
+	<!-- 简单的定时任务示例 -->
+	<bean id="mySimpleTimeTaskJobTest" class="com.elasticjob.demo.MyTimeTaskJob">
+		<!-- 这两项是必选配置 -->
+		<property name="cron" value="0/10 * * * * ?" />
+		<property name="shardingTotalCount" value="3" />
+		<!-- 这里是选填配置 内容详情参见BaseTimeTaskJob -->
+		<property name="jobName" value="mySimpleTimeTaskJobTest" />
+		<property name="shardingItemParameters" value="0=A,1=B,3=C" />
+		<property name="jobParameter" value="自定义参数" />
+		<property name="failover" value="false" />
+		<property name="misfire" value="true" />
+		<property name="description" value="简单的定时任务示例" />
+	</bean>
+	
+	<!-- 流式定时任务示例 -->
+	<bean id="myDataflowTimeTaskJobTest" class="com.elasticjob.demo.MyDataflowTimeTaskJob">
+		<!-- 这两项是必选配置 -->
+		<property name="cron" value="0/20 * * * * ?" />
+		<property name="shardingTotalCount" value="3" />
+		<!-- 这里是选填配置 内容详情参见BaseTimeTaskJob -->
+		<property name="jobName" value="myDataflowTimeTaskJobTest" />
+		<property name="shardingItemParameters" value="0=A,1=B,3=C" />
+		<property name="jobParameter" value="自定义参数" />
+		<property name="failover" value="false" />
+		<property name="misfire" value="true" />
+		<property name="description" value="流式定时任务示例" />
+	</bean>
+
+</beans>
